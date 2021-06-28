@@ -1,6 +1,15 @@
+function randomInteger(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function printCurrentRoundWinner(round, randNum, user) {
+  console.log(
+    `Round #${round}, random number is ${randNum}, ${user.name} score`
+  )
+}
+
 const args = process.argv.slice(2)
 
-// console.log("myArgs: ", args[1])
 const user1 = { name: args[0], score: 0 }
 const user2 = { name: args[1], score: 0 }
 
@@ -8,18 +17,14 @@ let whoWin = undefined
 let round = 1
 
 while (!whoWin) {
-  const randNum = Math.floor(Math.random() * (13 - -5 + 1)) + 1
+  const randNum = randomInteger(13, -5)
 
   if (randNum % 2 === 0) {
     user1.score++
-    console.log(
-      `Round #${round}, random number is ${randNum}, ${user1.name} score`
-    )
+    printCurrentRoundWinner(round, randNum, user1)
   } else {
     user2.score++
-    console.log(
-      `Round #${round}, random number is ${randNum}, ${user2.name} score`
-    )
+    printCurrentRoundWinner(round, randNum, user2)
   }
 
   if (user1.score === 3) whoWin = user1.name

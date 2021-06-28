@@ -2,6 +2,21 @@ function randomInteger(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
+function get2RandomDifferentNumbers(min, max) {
+  const num1 = randomInteger(min, max)
+  let num2 = randomInteger(min, max)
+  while (num1 === num2) {
+    num2 = randomInteger(min, max)
+  }
+  return { num1, num2 }
+}
+
+function createNewUserObjectIfNeeded(users, num) {
+  if (!users[num]) {
+    users[num] = { name: args[num], score: 0 }
+  }
+}
+
 function printCurrentRoundWinner(round, randNum, user) {
   console.log(
     `Round #${round}, random number is ${randNum}, ${user.name} score`
@@ -10,13 +25,24 @@ function printCurrentRoundWinner(round, randNum, user) {
 
 const args = process.argv.slice(2)
 
-const user1 = { name: args[0], score: 0 }
-const user2 = { name: args[1], score: 0 }
+if (args.length < 2 || args.length > 7) {
+  throw new Error("2 - 7 num players is aloowed")
+}
 
-let whoWin = undefined
+const users = {}
+let tournamentWinner = undefined
 let round = 1
+const winScore = args.length <= 5 ? 3 : 4
 
-while (!whoWin) {
+while (!tournamentWinner) {
+  const { num1, num2 } = get2RandomDifferentNumbers(0, args.length - 1)
+
+  createNewUserObjectIfNeeded(users, num1)
+  createNewUserObjectIfNeeded(users, num2)
+
+  const user1 = users[num1]
+  const user2 = users[num2]
+
   const randNum = randomInteger(13, -5)
 
   if (randNum % 2 === 0) {
@@ -27,8 +53,8 @@ while (!whoWin) {
     printCurrentRoundWinner(round, randNum, user2)
   }
 
-  if (user1.score === 3) whoWin = user1.name
-  else if (user2.score === 3) whoWin = user2.name
+  if (user1.score === winScore) tournamentWinner = user1.name
+  else if (user2.score === winScore) tournamentWinner = user2.name
 
   console.log(
     `Status ${user1.name}: ${user1.score}, ${user2.name}: ${user2.score}`
@@ -37,4 +63,4 @@ while (!whoWin) {
   round++
 }
 
-console.log(`${whoWin} Wins!`)
+console.log(`${tournamentWinner} Wins!`)

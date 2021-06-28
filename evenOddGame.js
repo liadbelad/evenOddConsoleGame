@@ -23,6 +23,11 @@ function printCurrentRoundWinner(round, randNum, user) {
   )
 }
 
+function checkWinner(winScore, user1, user2) {
+  if (user1.score === winScore) return user1
+  else if (user2.score === winScore) return user2
+}
+
 const args = process.argv.slice(2)
 
 if (args.length < 2 || args.length > 7) {
@@ -32,7 +37,7 @@ if (args.length < 2 || args.length > 7) {
 const users = {}
 let tournamentWinner = undefined
 let round = 1
-const winScore = args.length <= 5 ? 3 : 4
+const winScore = args.length > 5 ? Math.floor(args.length / 2) + 1 : 3
 
 while (!tournamentWinner) {
   const { num1, num2 } = get2RandomDifferentNumbers(0, args.length - 1)
@@ -53,8 +58,10 @@ while (!tournamentWinner) {
     printCurrentRoundWinner(round, randNum, user2)
   }
 
-  if (user1.score === winScore) tournamentWinner = user1.name
-  else if (user2.score === winScore) tournamentWinner = user2.name
+  const winner = checkWinner(winScore, user1, user2)
+  if (winner) {
+    tournamentWinner = winner
+  }
 
   console.log(
     `Status ${user1.name}: ${user1.score}, ${user2.name}: ${user2.score}`
@@ -63,4 +70,4 @@ while (!tournamentWinner) {
   round++
 }
 
-console.log(`${tournamentWinner} Wins!`)
+console.log(`${tournamentWinner.name} Wins!`)

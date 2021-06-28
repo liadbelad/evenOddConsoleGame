@@ -11,6 +11,10 @@ function get2RandomDifferentNumbers(min, max) {
   return { num1, num2 }
 }
 
+function checkIfNegativeEven(num) {
+  return num < 0 && num % 2 === 0
+}
+
 function createNewUserObjectIfNeeded(users, num) {
   if (!users[num]) {
     users[num] = { name: args[num], score: 0 }
@@ -37,7 +41,7 @@ if (args.length < 2 || args.length > 7) {
 const users = {}
 let tournamentWinner = undefined
 let round = 1
-const winScore = args.length > 5 ? Math.floor(args.length / 2) + 1 : 3
+let winScore = args.length > 5 ? Math.floor(args.length / 2) + 1 : 3
 
 while (!tournamentWinner) {
   const { num1, num2 } = get2RandomDifferentNumbers(0, args.length - 1)
@@ -70,4 +74,42 @@ while (!tournamentWinner) {
   round++
 }
 
-console.log(`${tournamentWinner.name} Wins!`)
+console.log(
+  `${tournamentWinner.name} Wins in tourmomant!, moving to boss fight !`
+)
+
+tournamentWinner.score = 0
+const boss = { name: "boss", score: 0 }
+round = 1
+winScore = 3
+let whoWinBossFight = undefined
+
+while (!whoWinBossFight) {
+  const randNum = randomInteger(13, -5)
+
+  if (checkIfNegativeEven(randNum)) {
+    console.log(`The number is ${randNum} - Boss special ability activated !`)
+    continue
+  }
+
+  if (randNum % 2 === 0) {
+    tournamentWinner.score++
+    printCurrentRoundWinner(round, randNum, tournamentWinner)
+  } else {
+    boss.score++
+    printCurrentRoundWinner(round, randNum, boss)
+  }
+
+  const winner = checkWinner(winScore, tournamentWinner, boss)
+  if (winner) {
+    whoWinBossFight = winner
+  }
+
+  console.log(
+    `Status ${tournamentWinner.name}: ${tournamentWinner.score}, ${boss.name}: ${boss.score}`
+  )
+
+  round++
+}
+
+console.log(`${whoWinBossFight.name} Wins in boss fight!`)

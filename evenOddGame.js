@@ -1,6 +1,22 @@
-function randomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
+const fs = require("fs")
+const {
+  get2RandomDifferentNumbers,
+  createNewUserObjectIfNeeded,
+  randomInteger,
+  printCurrentRoundWinner,
+  checkWinner,
+  printCurrentGameStatus,
+  appendDataToFile,
+  checkIfNegativeEven,
+  args,
+} = require("./utills/functions")
+
+const path = "./evenOddGameData.txt"
+
+if (!fs.existsSync(path)) {
+  fs.writeFileSync("./evenOddGameData.txt", "GAME RESULTS: \n")
 }
+<<<<<<< HEAD
 
 function get2RandomDifferentNumbers(min, max) {
   const num1 = randomInteger(min, max)
@@ -33,9 +49,12 @@ function checkWinner(winScore, user1, user2) {
 }
 
 const args = process.argv.slice(2)
+=======
+fs.readFileSync(path, { encoding: "utf-8" })
+>>>>>>> fs-module
 
 if (args.length < 2 || args.length > 7) {
-  throw new Error("2 - 7 num players is aloowed")
+  throw new Error("2 - 7 num players is allowed")
 }
 
 const users = {}
@@ -67,13 +86,50 @@ while (!tournamentWinner) {
     tournamentWinner = winner
   }
 
-  console.log(
-    `Status ${user1.name}: ${user1.score}, ${user2.name}: ${user2.score}`
-  )
+  printCurrentGameStatus(user1, user2)
 
   round++
 }
 
+console.log(
+  `${tournamentWinner.name} Wins in tourmomant!, moving to boss fight !`
+)
+
+appendDataToFile(path, tournamentWinner)
+
+tournamentWinner.score = 0
+const boss = { name: "boss", score: 0 }
+round = 1
+winScore = 3
+let whoWinBossFight = undefined
+
+while (!whoWinBossFight) {
+  const randNum = randomInteger(13, -5)
+
+  if (checkIfNegativeEven(randNum)) {
+    console.log(`The number is ${randNum} - Boss special ability activated !`)
+    continue
+  }
+
+  if (randNum % 2 === 0) {
+    tournamentWinner.score++
+    printCurrentRoundWinner(round, randNum, tournamentWinner)
+  } else {
+    boss.score++
+    printCurrentRoundWinner(round, randNum, boss)
+  }
+
+  const winner = checkWinner(winScore, tournamentWinner, boss)
+  if (winner) {
+    whoWinBossFight = winner
+  }
+
+  printCurrentGameStatus(tournamentWinner, boss)
+
+  round++
+}
+
+<<<<<<< HEAD
 console.log(
   `${tournamentWinner.name} Wins in tourmomant!, moving to boss fight !`
 )
@@ -113,3 +169,8 @@ while (!whoWinBossFight) {
 }
 
 console.log(`${whoWinBossFight.name} Wins in boss fight!`)
+=======
+console.log(`${whoWinBossFight.name} Wins in boss fight!`)
+
+appendDataToFile(path, whoWinBossFight)
+>>>>>>> fs-module

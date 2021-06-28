@@ -1,43 +1,31 @@
-function randomInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min
-}
+const fs = require("fs")
+const {
+  get2RandomDifferentNumbers,
+  createNewUserObjectIfNeeded,
+  randomInteger,
+  printCurrentRoundWinner,
+  checkWinner,
+  printCurrentGameStatus,
+  appendDataToFile,
+  checkIfNegativeEven,
+  args,
+} = require("./utills/functions")
 
-function get2RandomDifferentNumbers(min, max) {
-  const num1 = randomInteger(min, max)
-  let num2 = randomInteger(min, max)
-  while (num1 === num2) {
-    num2 = randomInteger(min, max)
-  }
-  return { num1, num2 }
-}
+const path = "./evenOddGameData.txt"
 
-function createNewUserObjectIfNeeded(users, num) {
-  if (!users[num]) {
-    users[num] = { name: args[num], score: 0 }
-  }
+if (!fs.existsSync(path)) {
+  fs.writeFileSync("./evenOddGameData.txt", "GAME RESULTS: \n")
 }
-
-function printCurrentRoundWinner(round, randNum, user) {
-  console.log(
-    `Round #${round}, random number is ${randNum}, ${user.name} score`
-  )
-}
-
-function checkWinner(winScore, user1, user2) {
-  if (user1.score === winScore) return user1
-  else if (user2.score === winScore) return user2
-}
-
-const args = process.argv.slice(2)
+fs.readFileSync(path, { encoding: "utf-8" })
 
 if (args.length < 2 || args.length > 7) {
-  throw new Error("2 - 7 num players is aloowed")
+  throw new Error("2 - 7 num players is allowed")
 }
 
 const users = {}
 let tournamentWinner = undefined
 let round = 1
-const winScore = args.length > 5 ? Math.floor(args.length / 2) + 1 : 3
+let winScore = args.length > 5 ? Math.floor(args.length / 2) + 1 : 3
 
 while (!tournamentWinner) {
   const { num1, num2 } = get2RandomDifferentNumbers(0, args.length - 1)
@@ -63,11 +51,49 @@ while (!tournamentWinner) {
     tournamentWinner = winner
   }
 
-  console.log(
-    `Status ${user1.name}: ${user1.score}, ${user2.name}: ${user2.score}`
-  )
+  printCurrentGameStatus(user1, user2)
 
   round++
 }
 
-console.log(`${tournamentWinner.name} Wins!`)
+console.log(
+  `${tournamentWinner.name} Wins in tourmomant!, moving to boss fight !`
+)
+
+appendDataToFile(path, tournamentWinner)
+
+tournamentWinner.score = 0
+const boss = { name: "boss", score: 0 }
+round = 1
+winScore = 3
+let whoWinBossFight = undefined
+
+while (!whoWinBossFight) {
+  const randNum = randomInteger(13, -5)
+
+  if (checkIfNegativeEven(randNum)) {
+    console.log(`The number is ${randNum} - Boss special ability activated !`)
+    continue
+  }
+
+  if (randNum % 2 === 0) {
+    tournamentWinner.score++
+    printCurrentRoundWinner(round, randNum, tournamentWinner)
+  } else {
+    boss.score++
+    printCurrentRoundWinner(round, randNum, boss)
+  }
+
+  const winner = checkWinner(winScore, tournamentWinner, boss)
+  if (winner) {
+    whoWinBossFight = winner
+  }
+
+  printCurrentGameStatus(tournamentWinner, boss)
+
+  round++
+}
+
+console.log(`${whoWinBossFight.name} Wins in boss fight!`)
+
+appendDataToFile(path, whoWinBossFight)
